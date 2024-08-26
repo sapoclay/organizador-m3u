@@ -45,7 +45,7 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 
 4. **Ejecuta la aplicación**:
     ```bash
-    python m3uorgan1zat0r.py
+    python3 m3uorgan1zat0r.py
     ```
 
 ## Uso
