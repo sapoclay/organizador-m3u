@@ -91,5 +91,5 @@ def show_how_to_use_dialog(main_window):
 
 def open_github_url(main_window):
     # URL del repositorio en GitHub
-    github_url = "https://github.com/sapoclay/ordenar-m3u"
+    github_url = "https://github.com/sapoclay/organizador-m3u"
     webbrowser.open(github_url)

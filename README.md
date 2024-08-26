@@ -1,38 +1,78 @@
-# organizador-m3u
+# M3U Organizer
 
-M3U Organizer es una herramienta escrita en Python utilizando PyQt5 para gestionar listas de reproducción en formato M3U. Este programa permite cargar, editar, y guardar listas de reproducción, además de ofrecer funcionalidades adicionales como la búsqueda y la reproducción de URLs.
+M3U Organizer es una aplicación que escribí por que alguien me ha pedido una aplicación de escritorio desarrollada en Python utilizando PyQt5, diseñada para facilitar la gestión y organización de listas de reproducción en formato M3U. Este programa te permite cargar, editar, organizar, y guardar listas M3U de manera sencilla e intuitiva. Es sencillo apliar las funcionalidades de la misma, por lo que si alguien lo necesita, que no dude en hacerlo.
 
 ## Características
 
-- **Cargar y guardar listas M3U**: Permite cargar archivos M3U y guardarlos después de realizar modificaciones.
-- **Búsqueda y selección**: Busca y resalta grupos o títulos específicos dentro del archivo.
-- **Reproducción de URLs**: Reproduce URLs seleccionadas directamente en VLC.
-- **Interfaz intuitiva**: Arrastra y suelta canales para reorganizarlos, y utiliza menús contextuales para opciones rápidas.
+- **Carga y Edición de Listas M3U**: Carga listas de reproducción en formato M3U para visualizarlas y editarlas.
+- **Organización de Canales**: Arrastra y suelta canales entre dos paneles de texto para organizar tu lista de reproducción.
+- **Búsqueda y Selección**: Busca y selecciona rápidamente canales basados en sus `group-title` u otros criterios.
+- **Reproducción con VLC**: Abre enlaces directamente en VLC desde la aplicación.
+- **Exportación de Listas**: Guarda tus listas de reproducción editadas en formato M3U.
+- **Menú Contextual**: Accede a funciones útiles mediante el menú contextual, como copiar, pegar, y abrir con VLC.
+- **Temas Personalizados**: Cambia entre temas claros y oscuros para mejorar la experiencia visual.
+- **Soporte Multilenguaje**: Disponible en varios idiomas.
 
-# Instalar dependencias
+## Capturas de Pantalla
 
-Asegúrate de tener Python 3.x y pip instalados. Luego, ejecuta:
+![Captura de Pantalla 1](resources/screenshot1.png)
+![Captura de Pantalla 2](resources/screenshot2.png)
 
-```pip install -r requirements.txt```
+## Requisitos del Sistema
 
-Nota: Si no hay un archivo requirements.txt, instala PyQt5 manualmente:
+- Python 3.7 o superior
+- PyQt5
+- VLC Media Player (opcional, para reproducción de URLs)
 
-```pip install PyQt5```
+## Instalación
 
-# Uso
+1. **Clona el repositorio**:
+    ```bash
+    git clone https://github.com/sapoclay/ordenar-m3u.git
+    cd ordenar-m3u
+    ```
 
-- Ejecutar el programa:
+2. **Crea un entorno virtual** (opcional, pero recomendado):
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # En Windows: venv\Scripts\activate
+    ```
 
-```python3 nombre_del_script.py```
+3. **Instala las dependencias**:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-- Cargar un archivo M3U. Utiliza la opción Archivo > Abrir M3U para cargar una lista de reproducción en el lado izquierdo de la pantalla.
+4. **Ejecuta la aplicación**:
+    ```bash
+    python m3uorgan1zat0r.py
+    ```
 
-- Editar y reorganizar. Arrastra el texto seleccionado entre los paneles o utiliza las opciones del menú contextual del ratón. Doble clic sobre una línea para editarla directamente.
+## Uso
 
-- Guardar el archivo M3U. Utiliza la opción Archivo > Guardar M3U para guardar tus cambios en un nuevo archivo M3U.
+1. **Cargar Lista M3U**: Usa el menú `Archivo > Abrir M3U` para cargar una lista de reproducción.
+2. **Organizar Canales**: Arrastra y suelta los canales entre los dos paneles de texto para organizarlos.
+3. **Buscar Canales**: Utiliza el menú `Editar > Buscar y seleccionar` para buscar canales específicos.
+4. **Guardar Lista**: Una vez organizada, guarda tu lista usando `Archivo > Guardar M3U`.
 
-- Reproducir URLs. Haz clic derecho en una URL y selecciona Abrir con VLC para reproducirla.
+## Contribuciones
 
-# Créditos
+¡Las contribuciones son bienvenidas! Si quieres contribuir, por favor sigue estos pasos:
 
-M3U Organizer fue desarrollado por entreunosyceros como un ejercicio práctico de Python.
+1. Haz un fork del proyecto.
+2. Crea una nueva rama (`git checkout -b feature/nueva-caracteristica`).
+3. Realiza los cambios necesarios y haz commits (`git commit -am 'Añadir nueva característica'`).
+4. Sube tus cambios a tu fork (`git push origin feature/nueva-caracteristica`).
+5. Crea un Pull Request en este repositorio.
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+
+## Contacto
+
+- **Autor**: entreunosyceros
+- **Email**: tuemail@dominio.com
+- **Repositorio en GitHub**: [https://github.com/sapoclay/ordenar-m3u](https://github.com/sapoclay/ordenar-m3u)
+
+Si tienes alguna pregunta o sugerencia, no dudes en contactar.
