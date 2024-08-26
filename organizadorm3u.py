@@ -52,6 +52,7 @@ Licencia:
 
 """
 
+import os
 from PyQt5.QtWidgets import QMainWindow, QTextEdit, QHBoxLayout, QWidget, QAction, QFileDialog, QMessageBox, QInputDialog,  QProgressDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor, QTextCharFormat, QBrush, QColor
@@ -154,30 +155,31 @@ class M3UOrganizer(QMainWindow):
 
     def load_m3u(self):
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getOpenFileName(self, "Abrir M3U", "", "M3U Files (*.m3u);;All Files (*)", options=options)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Abrir M3U local", "", "M3U Files (*.m3u);;All Files (*)", options=options)
         if file_path:
             self.start_loading_m3u(file_path)
 
     def load_m3u_from_url(self):
-        # Solicita al usuario la URL del archivo M3U
-        url, ok = QInputDialog.getText(self, 'Abrir M3U desde URL', 'Introduce la URL del archivo M3U:')
+        url, ok = QInputDialog.getText(self, 'Abrir M3U desde URL', 'Escribe la URL del archivo M3U:')
         
         if ok and url:
             try:
                 response = requests.get(url, stream=True)
-                response.raise_for_status()  # Verifica que la solicitud fue exitosa
+                response.raise_for_status()
 
                 # Guardar temporalmente el archivo M3U descargado
-                temp_file_path = str(current_directory / "temp_downloaded.m3u")
-                with open(temp_file_path, 'wb') as temp_file:
+                self.temp_file_path = str(current_directory / "temp_downloaded.m3u")
+                with open(self.temp_file_path, 'wb') as temp_file:
                     for chunk in response.iter_content(chunk_size=1024):
-                        if chunk:  # Filtra los keep-alive chunks
+                        if chunk:
                             temp_file.write(chunk)
 
-                self.start_loading_m3u(temp_file_path)
+                self.start_loading_m3u(self.temp_file_path)
 
             except requests.exceptions.RequestException as e:
                 QMessageBox.critical(self, "Error", f"No se pudo descargar el archivo: {str(e)}")
+                self.temp_file_path = None
+
 
     def start_loading_m3u(self, file_path):
         """Inicia la carga del archivo M3U, ya sea desde un archivo local o desde una URL."""
@@ -282,6 +284,10 @@ class M3UOrganizer(QMainWindow):
         reply = QMessageBox.question(self, 'Confirmar salida', '¿Está seguro de que desea salir?',
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
+            # Eliminar el archivo temporal si existe
+            if self.temp_file_path and os.path.exists(self.temp_file_path):
+                os.remove(self.temp_file_path)
+                self.temp_file_path = None
             # Cerrar todos los hilos y procesos en ejecución
             self.close_all_threads_and_processes()
             event.accept()
