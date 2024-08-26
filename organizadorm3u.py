@@ -53,14 +53,15 @@ Licencia:
 """
 
 import os
-from PyQt5.QtWidgets import QMainWindow, QTextEdit, QHBoxLayout, QWidget, QAction, QFileDialog, QMessageBox, QInputDialog,  QProgressDialog
+from PyQt5.QtWidgets import QMainWindow, QTextEdit, QHBoxLayout, QWidget, QAction, QFileDialog, QMessageBox, QInputDialog,  QProgressDialog, QSystemTrayIcon, QMenu
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QTextCursor, QTextCharFormat, QBrush, QColor
+from PyQt5.QtGui import QTextCursor, QTextCharFormat, QBrush, QColor, QIcon
 from pathlib import Path
-from optionsmenu import show_about_dialog, show_how_to_use_dialog, open_github_url
+from optionsmenu import show_about_dialog, show_how_to_use_dialog, open_github_url, abrir_vpn, restore_window, show_about_dialog
 from actions import copy_selection, paste_selection, show_context_menu, open_with_vlc, handle_double_click
 from threads import LoadFileThread, SearchThread
 import requests  # Importa la librería requests para realizar la descarga
+import logging
 
 # Directorio del script actual
 current_directory = Path(__file__).parent
@@ -70,8 +71,47 @@ class M3UOrganizer(QMainWindow):
         super().__init__()
         self.initUI()
         self.threads = []  # Inicializa el atributo threads
-
+        self.temp_file_path = None  # Añade un atributo para la ruta del archivo temporal
+        
     def initUI(self):
+        # Establecer un icono personalizado
+        icon_path = current_directory / 'resources/ordenar-m3u.png'
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
+            self.tray_icon = QSystemTrayIcon(QIcon(str(icon_path)), self)
+            self.tray_icon.setToolTip("Organizador m3u")
+
+            # Crear un menú para el icono de la bandeja del sistema
+            tray_menu = QMenu(self)
+            
+            # Acción para abrir la suscripción de VPN
+            vpn_action = QAction("30 días gratis de VPN", self)
+            vpn_action.triggered.connect(lambda: abrir_vpn(self))
+            tray_menu.addAction(vpn_action)
+            
+            # Acción para restaurar la ventana principal
+            restore_action = QAction("Restaurar", self)
+            restore_action.triggered.connect(lambda: restore_window(self))
+            tray_menu.addAction(restore_action)
+            
+            # Acción para abrir la ventana "Acerca de"
+            about_action = QAction("Acerca de", self)
+            about_action.triggered.connect(lambda: show_about_dialog(self))
+            tray_menu.addAction(about_action)
+            
+            
+            # Acción para salir de la aplicación
+            exit_action = QAction("Salir", self)
+            exit_action.triggered.connect(self.close)
+            tray_menu.addAction(exit_action)
+
+            # Configurar el menú de la bandeja
+            self.tray_icon.setContextMenu(tray_menu)
+            self.tray_icon.show()
+
+        else:
+            logging.warning(f"Icono no encontrado en {icon_path}")
+            
         self.loaded_lines = []  # Inicializar lista para acumular líneas cargadas
         self.setWindowTitle('M3U 0rgan1zat0r')
 
@@ -302,3 +342,4 @@ class M3UOrganizer(QMainWindow):
                 thread.wait()
         self.threads.clear()
 
+    

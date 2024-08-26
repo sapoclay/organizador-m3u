@@ -10,8 +10,6 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 - **Reproducción con VLC**: Abre enlaces directamente en VLC desde la aplicación.
 - **Exportación de Listas**: Guarda tus listas de reproducción editadas en formato M3U.
 - **Menú Contextual**: Accede a funciones útiles mediante el menú contextual, como copiar, pegar, y abrir con VLC.
-- **Temas Personalizados**: Cambia entre temas claros y oscuros para mejorar la experiencia visual.
-- **Soporte Multilenguaje**: Disponible en varios idiomas.
 
 ## Capturas de Pantalla
 

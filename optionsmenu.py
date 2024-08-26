@@ -93,3 +93,17 @@ def open_github_url(main_window):
     # URL del repositorio en GitHub
     github_url = "https://github.com/sapoclay/organizador-m3u"
     webbrowser.open(github_url)
+
+def abrir_vpn(self):
+    """
+    Abre la URL para obtener una VPN gratuita durante 30 días en el navegador web predeterminado.
+    """
+    webbrowser.open("https://www.expressvpn.com/refer-a-friend/30-days-free?locale=es&referrer_id=40141467&utm_campaign=referrals&utm_medium=copy_link&utm_source=referral_dashboard")
+
+def restore_window(self):
+    """
+    Restaura la ventana principal si está minimizada o escondida.
+    """
+    if self.isMinimized() or not self.isVisible():
+        self.showNormal()
+        self.activateWindow()
