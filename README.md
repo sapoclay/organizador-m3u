@@ -4,7 +4,7 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 
 ## Características
 
-- **Carga y Edición de Listas M3U**: Carga listas de reproducción en formato M3U para visualizarlas y editarlas.
+- **Carga y Edición de Listas M3U**: Carga listas de reproducción en formato M3U o M3U8, desde un archivo local o desde una URL, para visualizarlas y editarlas.
 - **Organización de Canales**: Arrastra y suelta canales entre dos paneles de texto para organizar tu lista de reproducción.
 - **Búsqueda y Selección**: Busca y selecciona rápidamente canales basados en sus `group-title` u otros criterios.
 - **Reproducción con VLC**: Abre enlaces directamente en VLC desde la aplicación.
@@ -50,10 +50,11 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 
 ## Uso
 
-1. **Cargar Lista M3U**: Usa el menú `Archivo > Abrir M3U` para cargar una lista de reproducción.
-2. **Organizar Canales**: Arrastra y suelta los canales entre los dos paneles de texto para organizarlos.
-3. **Buscar Canales**: Utiliza el menú `Editar > Buscar y seleccionar` para buscar canales específicos.
-4. **Guardar Lista**: Una vez organizada, guarda tu lista usando `Archivo > Guardar M3U`.
+1. **Cargar Lista M3U Local**: Usa el menú `Archivo > Abrir M3U local` para cargar una lista de reproducción desde un archivo descargado en tu equipo.
+2. **Cargar Lista M3U desde URL**: Usa el menú `Archivo > Abrir M3U desde URL` para cargar una lista de reproducción desde una URL en la que se encuentre el archivo m3u.
+3. **Organizar Canales**: Arrastra y suelta los canales entre los dos paneles de texto para organizarlos.
+4. **Buscar Canales**: Utiliza el menú `Editar > Buscar y seleccionar` para buscar canales específicos.
+5. **Guardar Lista**: Una vez organizada, guarda tu lista usando `Archivo > Guardar M3U`.
 
 ## Contribuciones
 

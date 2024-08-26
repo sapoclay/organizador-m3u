@@ -59,6 +59,7 @@ from pathlib import Path
 from optionsmenu import show_about_dialog, show_how_to_use_dialog, open_github_url
 from actions import copy_selection, paste_selection, show_context_menu, open_with_vlc, handle_double_click
 from threads import LoadFileThread, SearchThread
+import requests  # Importa la librería requests para realizar la descarga
 
 # Directorio del script actual
 current_directory = Path(__file__).parent
@@ -95,13 +96,16 @@ class M3UOrganizer(QMainWindow):
 
         # Menú Archivo
         file_menu = menubar.addMenu('Archivo')
-        open_action = QAction('Abrir M3U', self)
+        open_action = QAction('Abrir M3U local', self)
+        open_from_url_action = QAction('Abrir M3U desde URL', self)  
         save_action = QAction('Guardar M3U', self)
         exit_action = QAction('Salir', self)
         open_action.triggered.connect(self.load_m3u)
+        open_from_url_action.triggered.connect(self.load_m3u_from_url) 
         save_action.triggered.connect(self.save_m3u)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(open_action)
+        file_menu.addAction(open_from_url_action)  
         file_menu.addAction(save_action)
         file_menu.addAction(exit_action)
 
@@ -152,25 +156,50 @@ class M3UOrganizer(QMainWindow):
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getOpenFileName(self, "Abrir M3U", "", "M3U Files (*.m3u);;All Files (*)", options=options)
         if file_path:
-            self.text_left.clear()  # Borra el texto actual antes de cargar el nuevo archivo
+            self.start_loading_m3u(file_path)
 
-            self.progress_dialog = QProgressDialog("Cargando archivo...", "Cancelar", 0, 100, self)
-            self.progress_dialog.setWindowTitle("Cargando")
-            self.progress_dialog.setWindowModality(Qt.WindowModal)
-            self.progress_dialog.setMinimumDuration(0)
-            self.progress_dialog.setAutoClose(False)
-            self.progress_dialog.setValue(0)
+    def load_m3u_from_url(self):
+        # Solicita al usuario la URL del archivo M3U
+        url, ok = QInputDialog.getText(self, 'Abrir M3U desde URL', 'Introduce la URL del archivo M3U:')
+        
+        if ok and url:
+            try:
+                response = requests.get(url, stream=True)
+                response.raise_for_status()  # Verifica que la solicitud fue exitosa
 
-            self.thread = LoadFileThread(file_path)
-            self.threads.append(self.thread)
+                # Guardar temporalmente el archivo M3U descargado
+                temp_file_path = str(current_directory / "temp_downloaded.m3u")
+                with open(temp_file_path, 'wb') as temp_file:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        if chunk:  # Filtra los keep-alive chunks
+                            temp_file.write(chunk)
 
-            # Conexiones
-            self.thread.progress.connect(self.update_progress)
-            self.thread.lines_loaded.connect(self.append_text_to_left)
-            self.thread.finished.connect(self.on_file_loaded)
-            self.progress_dialog.canceled.connect(self.cancel_loading)
+                self.start_loading_m3u(temp_file_path)
 
-            self.thread.start()
+            except requests.exceptions.RequestException as e:
+                QMessageBox.critical(self, "Error", f"No se pudo descargar el archivo: {str(e)}")
+
+    def start_loading_m3u(self, file_path):
+        """Inicia la carga del archivo M3U, ya sea desde un archivo local o desde una URL."""
+        self.text_left.clear()  # Borra el texto actual antes de cargar el nuevo archivo
+
+        self.progress_dialog = QProgressDialog("Cargando archivo...", "Cancelar", 0, 100, self)
+        self.progress_dialog.setWindowTitle("Cargando")
+        self.progress_dialog.setWindowModality(Qt.WindowModal)
+        self.progress_dialog.setMinimumDuration(0)
+        self.progress_dialog.setAutoClose(False)
+        self.progress_dialog.setValue(0)
+
+        self.thread = LoadFileThread(file_path)
+        self.threads.append(self.thread)
+
+        # Conexiones
+        self.thread.progress.connect(self.update_progress)
+        self.thread.lines_loaded.connect(self.append_text_to_left)
+        self.thread.finished.connect(self.on_file_loaded)
+        self.progress_dialog.canceled.connect(self.cancel_loading)
+
+        self.thread.start()
 
     def update_progress(self, value):
         self.progress_dialog.setValue(value)
