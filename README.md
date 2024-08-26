@@ -72,7 +72,7 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para má
 ## Contacto
 
 - **Autor**: entreunosyceros
-- **Email**: tuemail@dominio.com
+- **Web**: entreunosyceros.net
 - **Repositorio en GitHub**: [https://github.com/sapoclay/ordenar-m3u](https://github.com/sapoclay/ordenar-m3u)
 
 Si tienes alguna pregunta o sugerencia, no dudes en contactar.
