@@ -40,10 +40,12 @@ Licencia:
 
 """
 
-from PyQt5.QtWidgets import QAction, QMenu, QMessageBox, QInputDialog
+from PyQt5.QtWidgets import QAction, QMenu, QMessageBox, QInputDialog, QMessageBox, QVBoxLayout, QDialog
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtCore import QProcess
+from PyQt5.QtMultimediaWidgets import QVideoWidget
 import sys
+import vlc
 
 def copy_selection(main_window):
     text_edit = main_window.text_left if main_window.text_left.hasFocus() else main_window.text_right
@@ -75,6 +77,11 @@ def show_context_menu(main_window, position):
         open_with_vlc_action.triggered.connect(lambda: open_with_vlc(main_window, selected_text))
         context_menu.addAction(open_with_vlc_action)
 
+        # Opción para previsualizar en VLC
+        preview_action = QAction("Previsualizar en VLC", main_window)
+        preview_action.triggered.connect(lambda: main_window.preview_stream_from_menu(selected_text))
+        context_menu.addAction(preview_action)
+
     # Opción para seleccionar todo el texto
     select_all_action = QAction("Seleccionar Todo", main_window)
     select_all_action.triggered.connect(lambda: (main_window.text_left.selectAll() if main_window.text_left.hasFocus() else main_window.text_right.selectAll()))
@@ -82,6 +89,7 @@ def show_context_menu(main_window, position):
 
     # Mostrar el menú contextual
     context_menu.exec_(main_window.text_left.mapToGlobal(position) if main_window.text_left.hasFocus() else main_window.text_right.mapToGlobal(position))
+
 
 def open_with_vlc(main_window, url):
     if sys.platform.startswith('linux'):
@@ -117,3 +125,51 @@ def handle_double_click(main_window, event):
 
     if ok:
         cursor.insertText(new_text)
+        
+class VideoDialog(QDialog):
+
+    def __init__(self, parent=None, instance=None):
+        super(VideoDialog, self).__init__(parent)
+        self.setWindowTitle("Video Preview")
+        self.video_widget = QVideoWidget()
+        self.video_widget.setMinimumSize(640, 480)
+        layout = QVBoxLayout()
+        layout.addWidget(self.video_widget)
+        self.setLayout(layout)
+        self.media_player = None
+        self.instance = instance
+
+    def closeEvent(self, event):
+        if self.media_player:
+            self.media_player.stop()
+        event.accept()
+
+    def play_video(self, url):
+        try:
+
+            # Crear un nuevo objeto de medios desde la URL
+            media = self.instance.media_new(url)
+            if not media:
+                raise Exception("No se pudo crear el objeto de medios VLC.")
+            # Establecer la opción vout en opengl
+            media.add_option('vout=opengl')
+            # Asociar el medio con el reproductor
+            self.media_player = vlc.MediaPlayer()
+            self.media_player.set_media(media)
+
+            # Establecer el widget de salida de video según el sistema operativo
+            if sys.platform.startswith('linux'):
+                self.media_player.set_xwindow(int(self.video_widget.winId()))
+            elif sys.platform.startswith('win'):
+                self.media_player.set_hwnd(int(self.video_widget.winId()))
+            elif sys.platform.startswith('darwin'):  # macOS
+                self.media_player.set_nsobject(int(self.video_widget.winId()))
+
+
+            # Reproducir el stream
+            self.media_player.play()
+            print("Reproduciendo URL:", url)  # Mensaje de depuración
+
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Error al intentar reproducir el stream: {str(e)}")

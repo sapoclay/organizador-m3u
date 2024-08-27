@@ -9,7 +9,7 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 - **Búsqueda y Selección**: Busca y selecciona rápidamente canales basados en sus `group-title` u otros criterios.
 - **Reproducción con VLC**: Abre enlaces directamente en VLC desde la aplicación.
 - **Exportación de Listas**: Guarda tus listas de reproducción editadas en formato M3U.
-- **Menú Contextual**: Accede a funciones útiles mediante el menú contextual, como copiar, pegar, y abrir con VLC.
+- **Menú Contextual**: Accede a funciones útiles mediante el menú contextual, como copiar, pegar, previsualizar y abrir con VLC.
 
 ## Capturas de Pantalla
 
@@ -50,9 +50,11 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 
 1. **Cargar Lista M3U Local**: Usa el menú `Archivo > Abrir M3U local` para cargar una lista de reproducción desde un archivo descargado en tu equipo.
 2. **Cargar Lista M3U desde URL**: Usa el menú `Archivo > Abrir M3U desde URL` para cargar una lista de reproducción desde una URL en la que se encuentre el archivo m3u.
-3. **Organizar Canales**: Arrastra y suelta los canales entre los dos paneles de texto para organizarlos.
-4. **Buscar Canales**: Utiliza el menú `Editar > Buscar y seleccionar` para buscar canales específicos.
-5. **Guardar Lista**: Una vez organizada, guarda tu lista usando `Archivo > Guardar M3U`.
+3. **Filtros y ordenación**: Puedes ordenar los canales utilizando los filtros las opciones de orden disponibles.
+4. **Organizar Canales**: Arrastra y suelta los canales entre los dos paneles de texto para organizarlos. También podrás copiar y pegar los canales.
+5. **Buscar Canales**: Utiliza el menú `Editar > Buscar y seleccionar` para buscar canales específicos.
+6. **Guardar Lista**: Una vez organizada, guarda tu lista usando `Archivo > Guardar M3U`.
+7. **Previsualizar**: En el menú contextual del ratón, sobre una URL, tendremos la posibilidad de previsualizar la emisión de la URL desde el propio programa. Así podremos saber si la URL tiene la emisión en activo y poder añadir la URL a nuestra lista sabiendo que está operativa.
 
 ## Contribuciones
 

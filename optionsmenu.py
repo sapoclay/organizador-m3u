@@ -39,6 +39,8 @@ from PyQt5.QtGui import QPixmap
 import webbrowser
 from pathlib import Path
 
+
+
 current_directory = Path(__file__).parent
 
 def show_about_dialog(main_window):
@@ -107,3 +109,4 @@ def restore_window(self):
     if self.isMinimized() or not self.isVisible():
         self.showNormal()
         self.activateWindow()
+        

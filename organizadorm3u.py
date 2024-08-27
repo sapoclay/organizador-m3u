@@ -53,7 +53,7 @@ Licencia:
 """
 
 import os
-from PyQt5.QtWidgets import QMainWindow, QTextEdit, QHBoxLayout, QWidget, QAction, QFileDialog, QMessageBox, QInputDialog,  QProgressDialog, QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import QMainWindow,  QTextEdit, QHBoxLayout, QWidget, QAction, QVBoxLayout, QFileDialog, QMessageBox, QInputDialog,  QProgressDialog, QSystemTrayIcon, QMenu, QPushButton, QComboBox, QLabel, QLineEdit
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor, QTextCharFormat, QBrush, QColor, QIcon
 from pathlib import Path
@@ -61,17 +61,36 @@ from optionsmenu import show_about_dialog, show_how_to_use_dialog, open_github_u
 from actions import copy_selection, paste_selection, show_context_menu, open_with_vlc, handle_double_click
 from threads import LoadFileThread, SearchThread
 import requests  # Importa la librería requests para realizar la descarga
-import logging
+import logging # Para el manejo de advertencias y errores
+import vlc
+import re
+from actions import VideoDialog 
 
 # Directorio del script actual
 current_directory = Path(__file__).parent
 
+
 class M3UOrganizer(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        try:
+            # Inicializar la instancia de VLC y el reproductor de medios
+            self.instance = vlc.Instance()
+            self.media_player = self.instance.media_player_new()
+
+            if not self.media_player:
+                raise Exception("Error al inicializar el reproductor de medios VLC.")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Error al inicializar VLC: {str(e)}")
+            self.media_player = None
+
         self.initUI()
         self.threads = []  # Inicializa el atributo threads
         self.temp_file_path = None  # Añade un atributo para la ruta del archivo temporal
+        self.original_content = []  # Almacena el contenido original sin filtrar ni ordenar
+
         
     def initUI(self):
         # Establecer un icono personalizado
@@ -113,26 +132,68 @@ class M3UOrganizer(QMainWindow):
             logging.warning(f"Icono no encontrado en {icon_path}")
             
         self.loaded_lines = []  # Inicializar lista para acumular líneas cargadas
+        self.original_lines = []  # Para almacenar la lista original sin filtrar/ordenar
         self.setWindowTitle('M3U 0rgan1zat0r')
 
         # Crear los widgets
         self.text_left = QTextEdit()
         self.text_right = QTextEdit()
+        
 
         # Hacer que ambos cuadros de texto acepten arrastrar y soltar
         self.text_left.setAcceptDrops(True)
         self.text_right.setAcceptDrops(True)
 
-        # Crear el diseño
+        # Crear los botones de filtrado, ordenación y reseteo
+        filter_label = QLabel("Filtrar:")
+        self.filter_input = QLineEdit()
+        filter_button = QPushButton("Aplicar")
+        filter_button.clicked.connect(self.filter_list)
+
+        sort_label = QLabel("Ordenar:")
+        self.sort_selector = QComboBox()
+        self.sort_selector.addItems([
+            'Nombre del Canal (A-Z)', 
+            'Nombre del Canal (Z-A)', 
+            'Group-title (A-Z)', 
+            'Group-title (Z-A)'
+        ])
+        sort_button = QPushButton("Aplicar")
+        sort_button.clicked.connect(self.sort_list)
+
+        reset_button = QPushButton("Restablecer")
+        reset_button.clicked.connect(self.reset_list)
+
+        # Layout superior con los botones de filtro, ordenación y reseteo
+        top_layout = QHBoxLayout()
+        top_layout.addWidget(filter_label)
+        top_layout.addWidget(self.filter_input)
+        top_layout.addWidget(filter_button)
+        top_layout.addWidget(sort_label)
+        top_layout.addWidget(self.sort_selector)
+        top_layout.addWidget(sort_button)
+        top_layout.addWidget(reset_button)
+
+        # Layout principal con los textos
         h_layout = QHBoxLayout()
         h_layout.addWidget(self.text_left)
         h_layout.addWidget(self.text_right)
+        #h_layout.addWidget(self.video_widget)  # Añadir el widget de video al diseño
+
+        # Layout final que combina todo
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(top_layout)
+        main_layout.addLayout(h_layout)
 
         container = QWidget()
-        container.setLayout(h_layout)
+        container.setLayout(main_layout)
         self.setCentralWidget(container)
+        
+        # Inicializar el reproductor de VLC
+        self.media_player = vlc.MediaPlayer()
+       # self.media_player.set_hwnd(self.video_widget.winId())
 
-        # Crear el menú
+        # Crear el menú (mantiene el código existente para el menú)
         menubar = self.menuBar()
 
         # Menú Archivo
@@ -161,6 +222,16 @@ class M3UOrganizer(QMainWindow):
         edit_menu.addAction(search_action)
         edit_menu.addAction(copy_action)
         edit_menu.addAction(paste_action)
+        
+        # Acción de Filtrado
+        filter_action = QAction('Filtrar', self)
+        filter_action.triggered.connect(self.filter_list)
+        edit_menu.addAction(filter_action)
+
+        # Acción de Ordenación
+        sort_action = QAction('Ordenar', self)
+        sort_action.triggered.connect(self.sort_list)
+        edit_menu.addAction(sort_action)
 
         # Menú Opciones
         options_menu = menubar.addMenu('Opciones')
@@ -192,6 +263,15 @@ class M3UOrganizer(QMainWindow):
         self.text_left.mouseDoubleClickEvent = lambda event: handle_double_click(self, event)
         self.text_right.mouseDoubleClickEvent = lambda event: handle_double_click(self, event)
 
+    def preview_stream_from_menu(self, url):
+
+        if not self.instance:
+            QMessageBox.critical(self, "Error", "El reproductor VLC no está inicializado.")
+            return
+
+        video_dialog = VideoDialog(self, instance=self.instance)  # Crear una instancia de VideoDialog
+        video_dialog.play_video(url)
+        video_dialog.exec_()
 
     def load_m3u(self):
         options = QFileDialog.Options()
@@ -220,10 +300,12 @@ class M3UOrganizer(QMainWindow):
                 QMessageBox.critical(self, "Error", f"No se pudo descargar el archivo: {str(e)}")
                 self.temp_file_path = None
 
-
     def start_loading_m3u(self, file_path):
-        """Inicia la carga del archivo M3U, ya sea desde un archivo local o desde una URL."""
+        """
+        Maneja el proceso de carga de un archivo M3U, ya sea desde un archivo local o una URL descargada.
+        """
         self.text_left.clear()  # Borra el texto actual antes de cargar el nuevo archivo
+        self.original_lines.clear()  # Limpiar la lista original
 
         self.progress_dialog = QProgressDialog("Cargando archivo...", "Cancelar", 0, 100, self)
         self.progress_dialog.setWindowTitle("Cargando")
@@ -237,18 +319,26 @@ class M3UOrganizer(QMainWindow):
 
         # Conexiones
         self.thread.progress.connect(self.update_progress)
-        self.thread.lines_loaded.connect(self.append_text_to_left)
+        self.thread.lines_loaded.connect(self.append_line_to_original)  # Almacenar línea por línea
         self.thread.finished.connect(self.on_file_loaded)
         self.progress_dialog.canceled.connect(self.cancel_loading)
 
         self.thread.start()
 
+    def append_line_to_original(self, line):
+        """
+        Almacena cada línea en la lista original y la añade al texto de la izquierda.
+        """
+        self.original_lines.append(line)
+        self.append_text_to_left(line)
+        
     def update_progress(self, value):
         self.progress_dialog.setValue(value)
 
     def append_text_to_left(self, text):
         # Ignora la línea #EXTM3U
         if not text.startswith("#EXTM3U"):
+            self.original_content.append(text)  # Almacena el contenido original sin la línea #EXTM3U
             # Aquí pasamos una lista con una sola línea a la función que maneja el coloreado
             self.append_lines_to_text_edit(self.text_left, [text])
 
@@ -328,6 +418,8 @@ class M3UOrganizer(QMainWindow):
             if self.temp_file_path and os.path.exists(self.temp_file_path):
                 os.remove(self.temp_file_path)
                 self.temp_file_path = None
+            if self.media_player is not None:
+                self.media_player.stop()
             # Cerrar todos los hilos y procesos en ejecución
             self.close_all_threads_and_processes()
             event.accept()
@@ -342,4 +434,61 @@ class M3UOrganizer(QMainWindow):
                 thread.wait()
         self.threads.clear()
 
-    
+    def filter_list(self):
+        """
+        Filtra la lista M3U en función del texto ingresado en la entrada de filtro.
+        """
+        filter_term = self.filter_input.text().strip()
+        if not filter_term:
+            QMessageBox.warning(self, "Entrada Vacía", "Por favor, ingrese un término para filtrar.")
+            return
+
+        filtered_lines = []
+        for line in self.original_lines:  # Usar la lista original para filtrar
+            if filter_term.lower() in line.lower():  # Filtra ignorando mayúsculas y minúsculas
+                filtered_lines.append(line)
+
+        if filtered_lines:
+            self.text_left.clear()
+            self.append_lines_to_text_edit(self.text_left, filtered_lines)
+        else:
+            QMessageBox.information(self, "Sin Resultados", "No se encontraron coincidencias con el criterio de filtrado.")
+
+    def extract_group_title(self, line):
+        match = re.search(r'group-title="([^"]*)"', line)
+        if match:
+            return match.group(1).strip().lower()
+        return ''  # Devuelve una cadena vacía si no se encuentra el group-title
+    def sort_list(self):
+        """
+        Ordena la lista M3U basada en la opción seleccionada en el combo box.
+        """
+        sort_criteria = self.sort_selector.currentText()
+        extinf_lines = [line for line in self.original_lines if line.startswith("#EXTINF:")]
+        stream_lines = [line for line in self.original_lines if line.startswith("http")]
+
+        if sort_criteria == 'Nombre del Canal (A-Z)':
+            sorted_lines = sorted(extinf_lines) + stream_lines
+        elif sort_criteria == 'Nombre del Canal (Z-A)':
+            sorted_lines = sorted(extinf_lines, reverse=True) + stream_lines
+        elif sort_criteria == 'Group-title (A-Z)':
+            sorted_lines = sorted(extinf_lines, key=lambda x: self.extract_group_title(x)) + stream_lines
+        elif sort_criteria == 'Group-title (Z-A)':
+            sorted_lines = sorted(extinf_lines, key=lambda x: self.extract_group_title(x), reverse=True) + stream_lines
+
+        self.text_left.clear()
+        self.append_lines_to_text_edit(self.text_left, sorted_lines)
+
+    def reset_list(self):
+        """
+        Restaura la lista original cargada antes de aplicar filtros u ordenaciones.
+        """
+        self.text_left.clear()
+        # Filtrar la línea que contiene #EXTM3U antes de mostrar el contenido
+        filtered_lines = [line for line in self.original_content if not line.startswith("#EXTM3U")]
+
+        # Mostrar el contenido filtrado en el cuadro de texto izquierdo
+        self.append_lines_to_text_edit(self.text_left, filtered_lines)
+
+        self.filter_input.clear()
+        self.sort_selector.setCurrentIndex(0)

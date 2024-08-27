@@ -51,6 +51,8 @@ Licencia:
 """
 
 from PyQt5.QtCore import QThread, pyqtSignal
+import os
+from PyQt5.QtWidgets import QMessageBox
 
 class LoadFileThread(QThread):
     progress = pyqtSignal(int)
@@ -101,3 +103,4 @@ class SearchThread(QThread):
                 positions[current_pos] = self.search_term
                 current_pos += len(self.search_term)
         self.result.emit(positions)
+        
