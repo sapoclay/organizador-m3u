@@ -15,6 +15,7 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 
 ![about-m3u-organ1zat0r](https://github.com/user-attachments/assets/4a926b38-134f-4cd5-ab36-08ac7cd63ae5)
 ![m3uorgan1zat0r-funcionando](https://github.com/user-attachments/assets/b3ee8e82-1a42-46be-afcf-ecaae940a176)
+![previsualizacion-video](https://github.com/user-attachments/assets/6a4a5003-81ab-41c2-86bf-ff9cfd20fa81)
 
 ## Requisitos del Sistema
 
