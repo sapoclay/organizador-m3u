@@ -1,54 +1,39 @@
 """
 organizadorm3u.py - Interfaz principal de M3U Organizer
 
-Este módulo define la clase `M3UOrganizer`, que representa la ventana principal de la aplicación M3U Organizer. 
-La clase gestiona la interfaz gráfica de usuario (GUI), incluyendo la carga y guardado de archivos M3U, 
-la interacción del usuario a través de menús, y la ejecución de hilos para tareas en segundo plano.
+Este módulo define la clase `M3UOrganizer`, una aplicación de escritorio PyQt5 diseñada para cargar, 
+filtrar, ordenar y gestionar archivos de listas de reproducción M3U. El programa permite al usuario 
+cargar archivos M3U desde el sistema de archivos local o desde una URL, editar y organizar los canales 
+listados, y guardarlos en un nuevo archivo M3U. También incluye integración con VLC para previsualizar 
+streams de vídeo directamente desde la aplicación.
+
+Principales funcionalidades:
+- Cargar archivos M3U locales o desde URL.
+- Filtrar y ordenar canales por nombre o group-title.
+- Interfaz gráfica intuitiva con soporte para arrastrar y soltar.
+- Previsualización de streams de vídeo utilizando VLC.
+- Guardado del archivo M3U con los cambios aplicados.
+- Soporte para menús contextuales y acciones personalizadas.
+
+El módulo también integra hilos para la carga de archivos M3U y la búsqueda dentro del archivo, 
+mejorando la respuesta de la interfaz gráfica durante operaciones de larga duración.
 
 Clases:
+--------
+M3UOrganizer(QMainWindow):
+    La clase principal de la aplicación que gestiona la interfaz de usuario y la lógica del programa. 
+    Contiene métodos para cargar, filtrar, ordenar, guardar y previsualizar archivos M3U.
 
-- `M3UOrganizer`: Hereda de `QMainWindow` y proporciona la funcionalidad principal de la aplicación, 
-  permitiendo al usuario gestionar listas de reproducción en formato M3U.
-
-Métodos:
-
-- `__init__(self)`: Constructor que inicializa la interfaz de usuario y los componentes principales.
-- `initUI(self)`: Configura la interfaz gráfica, crea menús y establece las conexiones para los eventos de usuario.
-- `load_m3u(self)`: Abre un diálogo para seleccionar y cargar un archivo M3U en el editor de texto izquierdo.
-- `update_progress(self, value)`: Actualiza el progreso de la carga del archivo en un diálogo de progreso.
-- `append_text_to_left(self, text)`: Añade texto al editor de texto izquierdo, ignorando líneas específicas.
-- `on_file_loaded(self)`: Maneja la finalización de la carga del archivo, cerrando el diálogo de progreso.
-- `cancel_loading(self)`: Cancela la carga del archivo si el usuario así lo indica.
-- `append_lines_to_text_edit(self, text_edit, lines)`: Añade líneas de texto al editor con formato de color según el tipo de contenido.
-- `append_colored_text_with_cursor(self, cursor, text, color)`: Inserta texto coloreado en la posición actual del cursor.
-- `on_lines_loaded(self, line)`: Maneja la carga de líneas en grupos para evitar sobrecargar la UI.
-- `save_m3u(self)`: Guarda el contenido del editor de texto derecho en un archivo M3U.
-- `search_group_title(self)`: Busca y resalta un término específico en el editor de texto izquierdo.
-- `on_search_finished(self, positions)`: Resalta todas las coincidencias encontradas durante la búsqueda.
-- `closeEvent(self, event)`: Pregunta al usuario si desea cerrar la aplicación y maneja el cierre seguro de hilos.
-- `close_all_threads_and_processes(self)`: Cierra todos los hilos y procesos en ejecución antes de salir de la aplicación.
-
-Dependencias:
-    - PyQt5.QtWidgets: Para manejar la ventana principal, menús, diálogos y otros widgets.
-    - PyQt5.QtGui: Para trabajar con cursores, formatos de texto y colores.
-    - PyQt5.QtCore: Para gestionar hilos, señales y otros eventos.
-    - pathlib.Path: Para manejar rutas de archivos y directorios.
-    - `optionsmenu`: Importa funciones para mostrar diálogos de opciones y abrir URLs.
-    - `actions`: Importa funciones que manejan acciones como copiar, pegar y mostrar menús contextuales.
-    - `threads`: Importa clases que gestionan tareas de carga de archivos y búsqueda en segundo plano.
-
-Uso:
-    Este módulo se ejecuta como la ventana principal cuando se inicia la aplicación M3U Organizer, proporcionando 
-    todas las funcionalidades necesarias para gestionar listas de reproducción M3U.
-
-Autores:
-    - entreunosyceros (autor principal)
-
-Versión:
-    0.5
-
-Licencia:
-    Libre para uso personal y educativo.
+Imports:
+--------
+- PyQt5.QtWidgets: Proporciona los componentes básicos de la GUI.
+- PyQt5.QtCore: Contiene clases básicas no gráficas.
+- PyQt5.QtGui: Proporciona funcionalidades gráficas, como la manipulación de texto y el uso de colores.
+- pathlib.Path: Se utiliza para manejar rutas de archivos de manera sencilla.
+- requests: Maneja las descargas de archivos M3U desde URL.
+- vlc: Proporciona la integración con el reproductor VLC.
+- re: Proporciona soporte para expresiones regulares.
+- logging: Proporciona soporte para la generación de logs.
 
 """
 

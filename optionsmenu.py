@@ -1,36 +1,21 @@
 """
 optionsmenu.py - Diálogos y Funciones de Menú para M3U Organizer
 
-Este módulo contiene funciones que implementan diálogos informativos y acciones de menú dentro de la aplicación M3U Organizer. 
-Proporciona opciones para mostrar información sobre la aplicación, guías de uso, y abrir la URL del repositorio en GitHub.
+Este módulo contiene las funciones relacionadas con el menú de opciones de la aplicación M3U Organizer, 
+incluyendo diálogos informativos y enlaces a recursos en línea.
 
 Funciones:
+----------
+- show_about_dialog(main_window): Muestra un cuadro de diálogo con información sobre la aplicación, 
+  incluyendo una breve descripción y un logotipo.
+- show_how_to_use_dialog(main_window): Muestra un cuadro de diálogo con instrucciones detalladas sobre 
+  cómo usar M3U Organizer, incluyendo el formato de listas M3U y las funcionalidades principales de la aplicación.
+- open_github_url(main_window): Abre la página del repositorio GitHub del proyecto en el navegador web predeterminado.
+- abrir_vpn(self): Abre una URL en el navegador para obtener una VPN gratuita durante 30 días.
+- restore_window(self): Restaura la ventana principal si está minimizada o no visible, devolviéndola a su estado normal.
 
-- `show_about_dialog(main_window)`: Muestra un diálogo "Acerca de" con información sobre la aplicación M3U Organizer.
-- `show_how_to_use_dialog(main_window)`: Muestra un diálogo con instrucciones sobre cómo usar la aplicación.
-- `open_github_url(main_window)`: Abre la URL del repositorio de la aplicación en GitHub en el navegador web predeterminado.
-
-Parámetros:
-- `main_window (QMainWindow)`: La ventana principal de la aplicación, que se pasa como argumento para que los diálogos se abran como modales desde la ventana principal.
-
-Dependencias:
-    - PyQt5.QtWidgets: Para manejar los diálogos y la interfaz de usuario.
-    - PyQt5.QtGui: Para cargar y mostrar imágenes en los diálogos.
-    - webbrowser: Para abrir URLs en el navegador web predeterminado del sistema.
-    - pathlib.Path: Para manejar rutas de archivos y directorios de forma segura y eficiente.
-
-Uso:
-    Este módulo se importa en `organizadorm3u.py` para proporcionar funciones de menú que permiten a los usuarios ver 
-    información sobre la aplicación, aprender a usarla y acceder al código fuente en GitHub.
-
-Autores:
-    - entreunosyceros (autor principal)
-
-Versión:
-    0.5
-
-Licencia:
-    Libre para uso personal y educativo.
+Este módulo está diseñado para proporcionar acceso a recursos adicionales y 
+ayuda al usuario, así como para manejar algunas acciones relacionadas con la interfaz de usuario.
 
 """
 

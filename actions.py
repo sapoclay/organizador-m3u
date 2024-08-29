@@ -1,45 +1,33 @@
 """
 actions.py - Funciones de Acción para M3U Organizer
 
-Este módulo contiene funciones que manejan diversas acciones dentro de la aplicación M3U Organizer. 
-Las funciones aquí definidas se encargan de operaciones como copiar y pegar texto, mostrar menús contextuales, 
-abrir URLs en VLC, y manejar eventos de doble clic para editar líneas en la interfaz de usuario.
+Este módulo contiene las acciones relacionadas con la interacción del usuario en una aplicación PyQt5
+que gestiona listas de reproducción M3U y URLs para su reproducción con VLC. 
+
+Además, este módulo interactúa con el sistema de archivos para guardar y cargar URLs, 
+y utiliza la `vlc` para reproducir vídeos fuera del programa.
 
 Funciones:
+----------
+- copy_selection(main_window): Copia el texto seleccionado en el QTextEdit enfocado.
+- paste_selection(main_window): Pega el texto del portapapeles en el QTextEdit enfocado.
+- show_context_menu(main_window, position): Muestra un menú contextual en la posición dada 
+  con opciones de copiar, pegar, abrir en VLC, previsualizar streaming y seleccionar todo.
+- open_with_vlc(main_window, url): Abre la URL dada en VLC según el sistema operativo.
+- handle_double_click(main_window, event): Maneja la edición de una línea de texto en un QTextEdit al hacer doble clic.
+- VideoDialog(QDialog): Crea una ventana detro del programa para previsualizar un stream de video utilizando 
+python-VLC en un widget de video integrado.
+- load_urls(): Carga las URLs guardadas desde un archivo JSON.
+- save_urls(urls): Guarda las URLs en un archivo JSON.
+- guardar_url(self): Muestra un diálogo para guardar una nueva URL bajo un nombre específico.
+- ver_urls_guardadas(self): Muestra un diálogo para gestionar las URLs guardadas, permitiendo editarlas, eliminarlas y copiarlas.
 
-- `copy_selection(main_window)`: Copia el texto seleccionado del área de texto que tiene el foco en la ventana principal.
-- `paste_selection(main_window)`: Pega el texto copiado en el área de texto que tiene el foco en la ventana principal.
-- `show_context_menu(main_window, position)`: Muestra un menú contextual en la posición dada, ofreciendo opciones para copiar, pegar, seleccionar todo, y abrir URLs en VLC.
-- `open_with_vlc(main_window, url)`: Abre una URL en VLC, dependiendo del sistema operativo.
-- `handle_double_click(main_window, event)`: Maneja el evento de doble clic en un área de texto, permitiendo al usuario editar la línea seleccionada.
-
-Parámetros:
-- `main_window (QMainWindow)`: La ventana principal de la aplicación, que contiene las áreas de texto y otros widgets.
-- `position (QPoint)`: La posición donde se debe mostrar el menú contextual.
-- `event (QMouseEvent)`: El evento de ratón que desencadena la acción de doble clic.
-- `url (str)`: La URL que se intenta abrir con VLC.
-
-Dependencias:
-    - PyQt5.QtWidgets: Para manejar widgets y diálogos en la GUI.
-    - PyQt5.QtGui: Para trabajar con cursores y eventos gráficos.
-    - PyQt5.QtCore: Para manejar procesos y eventos.
-    - sys: Para identificar el sistema operativo y manejar excepciones.
-
-Uso:
-    Este módulo se importa en `organizadorm3u.py` y sus funciones se conectan a eventos de usuario 
-    (como clics y selecciones) para realizar las acciones correspondientes.
-
-Autores:
-    - entreunosyceros (autor principal)
-
-Versión:
-    0.5
-
-Licencia:
-    Libre para uso personal y educativo.
+Clases:
+-------
+- VideoDialog: Clase que representa una ventana para previsualizar videos utilizando el paquete python-vlc que se instala con el archivo 
+requirements.txt.
 
 """
-
 
 from PyQt5.QtWidgets import (QAction, QDialog, QLineEdit, 
                              QApplication, QDialog, QVBoxLayout, QPushButton, QListWidget,

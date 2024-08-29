@@ -5,7 +5,7 @@
 M3U Organizer es una aplicación que escribí por que alguien me ha pedido una aplicación de escritorio desarrollada en Python utilizando PyQt5, diseñada para facilitar la gestión y organización de listas de reproducción en formato M3U. Este programa te permite cargar, editar, organizar, y guardar listas M3U de manera sencilla e intuitiva. Es sencillo apliar las funcionalidades de la misma, por lo que si alguien lo necesita, que no dude en hacerlo.
 
 ## Características
-
+ 
 - **Carga y Edición de Listas M3U**: Carga listas de reproducción en formato M3U o M3U8, desde un archivo local o desde una URL, para visualizarlas y editarlas.
 - **Organización de Canales**: Arrastra y suelta canales entre dos paneles de texto para organizar tu lista de reproducción.
 - **Búsqueda y Selección**: Busca y selecciona rápidamente canales basados en sus `group-title` u otros criterios.

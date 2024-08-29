@@ -6,8 +6,8 @@ una herramienta diseñada para facilitar la gestión y organización de listas d
 en formato M3U. 
 
 El programa utiliza PyQt5 para proporcionar una interfaz gráfica de usuario (GUI) 
-que permite cargar, editar, buscar y guardar archivos M3U de manera intuitiva. 
-Los usuarios pueden visualizar y manipular el contenido de listas de reproducción M3U 
+que permite cargar, editar, buscar y guardar archivos M3U de manera intuitiva y rápida. 
+Los usuarios pueden previsualizar, visualizar y manipular el contenido de listas de reproducción M3U 
 a través de dos paneles de texto, con opciones adicionales para copiar, pegar, 
 buscar títulos de grupos, y abrir URLs en VLC.
 
@@ -28,6 +28,7 @@ Estructura del Proyecto:
     - `actions.py`: Define las funciones para manejar acciones del usuario, como copiar, pegar, y mostrar menús contextuales.
     - `threads.py`: Define hilos para cargar archivos M3U y buscar dentro del contenido.
     - `optionsmenu.py`: Contiene funciones para mostrar diálogos de "Acerca de" y "Cómo usar".
+    - `url_guardadas.json: Contiene las URL y los nombres que el usuario guarde".
 
 Uso:
     Antes de comenzar, instala las dependencias ejecutando:
@@ -42,8 +43,8 @@ Uso:
     python m3uorgan1zat0r.py
     ```
 
-Autores:
-    - entreunosyceros (autor principal)
+Autor:
+    - entreunosyceros
 
 Versión:
     0.5
