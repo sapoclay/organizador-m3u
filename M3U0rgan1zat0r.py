@@ -40,7 +40,7 @@ Uso:
     Simplemente ejecuta este script para iniciar la aplicación:
 
     ```bash
-    python m3uorgan1zat0r.py
+    python3 M3U0rgan1zat0r.py
     ```
 
 Autor:
