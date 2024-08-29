@@ -58,7 +58,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QTextCursor, QTextCharFormat, QBrush, QColor, QIcon
 from pathlib import Path
 from optionsmenu import show_about_dialog, show_how_to_use_dialog, open_github_url, abrir_vpn, restore_window, show_about_dialog
-from actions import copy_selection, paste_selection, show_context_menu, open_with_vlc, handle_double_click
+from actions import copy_selection, paste_selection, show_context_menu, open_with_vlc, handle_double_click, guardar_url, ver_urls_guardadas
 from threads import LoadFileThread, SearchThread
 import requests  # Importa la librería requests para realizar la descarga
 import logging # Para el manejo de advertencias y errores
@@ -232,6 +232,18 @@ class M3UOrganizer(QMainWindow):
         sort_action = QAction('Ordenar', self)
         sort_action.triggered.connect(self.sort_list)
         edit_menu.addAction(sort_action)
+        
+        # Menú Listas
+        list_menu = menubar.addMenu('Listas')
+        
+        # Subopción guardar URL
+        save_list_action = QAction('Guardar URL', self)
+        save_list_action.triggered.connect(lambda: guardar_url(self) )
+        list_menu.addAction(save_list_action)
+        # Ver URL
+        view_list_action = QAction('Ver URLS Guardadas', self)
+        view_list_action.triggered.connect(lambda: ver_urls_guardadas(self) )
+        list_menu.addAction(view_list_action)
 
         # Menú Opciones
         options_menu = menubar.addMenu('Opciones')
@@ -437,6 +449,7 @@ class M3UOrganizer(QMainWindow):
     def filter_list(self):
         """
         Filtra la lista M3U en función del texto ingresado en la entrada de filtro.
+        Cada canal está compuesto por un par de líneas (EXTINF y URL).
         """
         filter_term = self.filter_input.text().strip()
         if not filter_term:
@@ -444,9 +457,15 @@ class M3UOrganizer(QMainWindow):
             return
 
         filtered_lines = []
-        for line in self.original_lines:  # Usar la lista original para filtrar
-            if filter_term.lower() in line.lower():  # Filtra ignorando mayúsculas y minúsculas
-                filtered_lines.append(line)
+        # Iterar en pasos de 2 para considerar cada canal (EXTINF + URL) como un bloque
+        for i in range(0, len(self.original_lines), 2):
+            extinf_line = self.original_lines[i]
+            url_line = self.original_lines[i + 1] if i + 1 < len(self.original_lines) else ""
+            
+            # Verificar si el término de filtro aparece en alguna de las dos líneas
+            if filter_term.lower() in extinf_line.lower() or filter_term.lower() in url_line.lower():
+                filtered_lines.append(extinf_line)
+                filtered_lines.append(url_line)
 
         if filtered_lines:
             self.text_left.clear()
@@ -454,27 +473,35 @@ class M3UOrganizer(QMainWindow):
         else:
             QMessageBox.information(self, "Sin Resultados", "No se encontraron coincidencias con el criterio de filtrado.")
 
+
     def extract_group_title(self, line):
         match = re.search(r'group-title="([^"]*)"', line)
         if match:
             return match.group(1).strip().lower()
         return ''  # Devuelve una cadena vacía si no se encuentra el group-title
+    
     def sort_list(self):
         """
         Ordena la lista M3U basada en la opción seleccionada en el combo box.
+        Cada canal está compuesto por un par de líneas (EXTINF y URL).
         """
         sort_criteria = self.sort_selector.currentText()
-        extinf_lines = [line for line in self.original_lines if line.startswith("#EXTINF:")]
-        stream_lines = [line for line in self.original_lines if line.startswith("http")]
+
+        # Crear pares de líneas para cada canal
+        channel_pairs = [(self.original_lines[i], self.original_lines[i + 1])
+                        for i in range(0, len(self.original_lines), 2)]
 
         if sort_criteria == 'Nombre del Canal (A-Z)':
-            sorted_lines = sorted(extinf_lines) + stream_lines
+            sorted_pairs = sorted(channel_pairs, key=lambda pair: pair[0])
         elif sort_criteria == 'Nombre del Canal (Z-A)':
-            sorted_lines = sorted(extinf_lines, reverse=True) + stream_lines
+            sorted_pairs = sorted(channel_pairs, key=lambda pair: pair[0], reverse=True)
         elif sort_criteria == 'Group-title (A-Z)':
-            sorted_lines = sorted(extinf_lines, key=lambda x: self.extract_group_title(x)) + stream_lines
+            sorted_pairs = sorted(channel_pairs, key=lambda pair: self.extract_group_title(pair[0]))
         elif sort_criteria == 'Group-title (Z-A)':
-            sorted_lines = sorted(extinf_lines, key=lambda x: self.extract_group_title(x), reverse=True) + stream_lines
+            sorted_pairs = sorted(channel_pairs, key=lambda pair: self.extract_group_title(pair[0]), reverse=True)
+
+        # Descomprimir los pares en una lista simple de líneas ordenadas
+        sorted_lines = [line for pair in sorted_pairs for line in pair]
 
         self.text_left.clear()
         self.append_lines_to_text_edit(self.text_left, sorted_lines)

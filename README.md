@@ -1,4 +1,5 @@
-# ![ordenar-m3u](https://github.com/user-attachments/assets/115f63ed-0579-4074-a681-f18a05f8ead8)  M3U Organizer
+<center># M3U Organizer</center>
+<center>![ordenar-m3u](https://github.com/user-attachments/assets/115f63ed-0579-4074-a681-f18a05f8ead8)</center>
 
 M3U Organizer es una aplicación que escribí por que alguien me ha pedido una aplicación de escritorio desarrollada en Python utilizando PyQt5, diseñada para facilitar la gestión y organización de listas de reproducción en formato M3U. Este programa te permite cargar, editar, organizar, y guardar listas M3U de manera sencilla e intuitiva. Es sencillo apliar las funcionalidades de la misma, por lo que si alguien lo necesita, que no dude en hacerlo.
 
@@ -9,6 +10,7 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 - **Búsqueda y Selección**: Busca y selecciona rápidamente canales basados en sus `group-title` u otros criterios.
 - **Reproducción con VLC**: Abre enlaces directamente en VLC desde la aplicación.
 - **Exportación de Listas**: Guarda tus listas de reproducción editadas en formato M3U.
+- **Listas**: Nos va a permitir guardar nuestras listas m3u preferidas. Podremos guardar la URL, y añadir un nombre identificativo. Se podrá copiar la URL para utilizarla para poder trabajar o ver la lista m3u. El listado de URL se guardará como archivo .JSON en el mismo directorio del programa.
 - **Menú Contextual**: Accede a funciones útiles mediante el menú contextual, como copiar, pegar, previsualizar y abrir con VLC.
 
 ## Capturas de Pantalla

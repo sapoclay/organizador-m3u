@@ -76,12 +76,20 @@ def show_how_to_use_dialog(main_window):
     layout = QVBoxLayout()
 
     # Texto de la explicación
-    instruction_text = ("1. Usa 'Abrir M3U' para cargar una lista de reproducción en el lado izquierdo de la pantalla.\n"
+    instruction_text = ("0. Formato de lista .m3u válido:\n"
+                        "#EXTM3U\n"
+                        "#EXTINF:-1 ETIQUETAS\n"
+                        "http://URL-DEL-STREAMING\n"
+                        "#EXTINF:-1 ETIQUETAS\n"
+                        "http://URL-DEL-STREAMING\n"
+                        "---------------------------\n"
+                        "1. Usa 'Abrir M3U' para cargar una lista de reproducción en el lado izquierdo de la pantalla.\n"
                         "2. Utiliza la opción 'Abrir con VLC' en el menú contextual del ratón para reproducir la URL seleccionada en el lado izquierdo de la pantalla.\n"
                         "3. En el menú contextual del ratón también podrás seleccionar todo el contenido del lado izquierdo de la pantalla.\n"
                         "4. Usa 'Buscar y seleccionar' para buscar un group-title.\n"
-                        "5. Arrastra el texto seleccionado de un lado a otro de la pantalla.\n Ordena el texto seleccionado del lado derecho de la pantalla arrastrando o utilizando las opciones del menú del ratón.\n"
-                        "6. Puedes copiar la selección al panel derecho y guardar la lista modificada como un archivo m3u.\n")
+                        "5. El usuario podrá previsualizar el streaming de la URL seleccionada en el lado izquierdo de pantalla.\n También podrá directamente abrir la URL con VLC para ver el streaming."
+                        "6. Arrastra el texto seleccionado de un lado a otro de la pantalla.\n Ordena el texto seleccionado del lado derecho de la pantalla arrastrando o utilizando las opciones del menú del ratón.\n"
+                        "7. Puedes copiar la selección al panel derecho y guardar la lista modificada como un archivo m3u.\n")
     instruction_label = QLabel(instruction_text)
     instruction_label.setWordWrap(True)
     layout.addWidget(instruction_label)

@@ -48,9 +48,6 @@ Autores:
 Versión:
     0.5
 
-Licencia:
-    Libre para uso personal y educativo.
-
 """
 
 import sys

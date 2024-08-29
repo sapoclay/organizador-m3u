@@ -40,12 +40,17 @@ Licencia:
 
 """
 
-from PyQt5.QtWidgets import QAction, QMenu, QMessageBox, QInputDialog, QMessageBox, QVBoxLayout, QDialog
+
+from PyQt5.QtWidgets import (QAction, QDialog, QLineEdit, 
+                             QApplication, QDialog, QVBoxLayout, QPushButton, QListWidget,
+                            QInputDialog, QMenu, QMessageBox, QScrollArea, QWidget)
 from PyQt5.QtGui import QTextCursor
-from PyQt5.QtCore import QProcess
+from PyQt5.QtCore import QProcess, QTimer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 import sys
 import vlc
+import json
+import os
 
 def copy_selection(main_window):
     text_edit = main_window.text_left if main_window.text_left.hasFocus() else main_window.text_right
@@ -78,7 +83,7 @@ def show_context_menu(main_window, position):
         context_menu.addAction(open_with_vlc_action)
 
         # Opción para previsualizar en VLC
-        preview_action = QAction("Previsualizar en VLC", main_window)
+        preview_action = QAction("Previsualizar Streaming", main_window)
         preview_action.triggered.connect(lambda: main_window.preview_stream_from_menu(selected_text))
         context_menu.addAction(preview_action)
 
@@ -127,7 +132,6 @@ def handle_double_click(main_window, event):
         cursor.insertText(new_text)
         
 class VideoDialog(QDialog):
-
     def __init__(self, parent=None, instance=None):
         super(VideoDialog, self).__init__(parent)
         self.setWindowTitle("Video Preview")
@@ -146,17 +150,18 @@ class VideoDialog(QDialog):
 
     def play_video(self, url):
         try:
-
             # Crear un nuevo objeto de medios desde la URL
             media = self.instance.media_new(url)
             if not media:
                 raise Exception("No se pudo crear el objeto de medios VLC.")
+            
             # Establecer la opción vout en opengl
             media.add_option('vout=opengl')
+            
             # Asociar el medio con el reproductor
             self.media_player = vlc.MediaPlayer()
             self.media_player.set_media(media)
-
+            
             # Establecer el widget de salida de video según el sistema operativo
             if sys.platform.startswith('linux'):
                 self.media_player.set_xwindow(int(self.video_widget.winId()))
@@ -165,11 +170,145 @@ class VideoDialog(QDialog):
             elif sys.platform.startswith('darwin'):  # macOS
                 self.media_player.set_nsobject(int(self.video_widget.winId()))
 
-
-            # Reproducir el stream
+            # Comenzar la reproducción (sin mostrar la ventana aún)
             self.media_player.play()
             print("Reproduciendo URL:", url)  # Mensaje de depuración
 
+            # Esperar un momento para verificar si el stream comienza
+            QTimer.singleShot(3000, self.check_stream_status)  # Esperar 3 segundos antes de verificar
 
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Error al intentar reproducir el stream: {str(e)}")
+
+    def check_stream_status(self):
+        # Comprobar si el estado es Error, Stopped o Ended
+        if self.media_player.get_state() in [vlc.State.Error, vlc.State.Stopped, vlc.State.Ended]:
+            # Detener el reproductor y mostrar un mensaje de error
+            self.media_player.stop()
+            QMessageBox.warning(self, "Error de reproducción", "No se pudo reproducir el stream. La URL puede estar inactiva o ser incorrecta.")
+            print("El stream no se pudo reproducir.")
+            self.close()  # Cerrar la ventana si la reproducción falla
+        else:
+            self.show()  # Mostrar la ventana solo si la reproducción es exitosa
+
+            
+# Acciones sobre las URL a Guardar
+def load_urls():
+    if not os.path.exists("urls_guardadas.json"):
+        return {}
+    
+    with open("urls_guardadas.json", "r") as file:
+        return json.load(file)
+
+def save_urls(urls):
+    with open("urls_guardadas.json", "w") as file:
+        json.dump(urls, file, indent=4)
+
+
+def guardar_url(self):
+    # Mostrar un cuadro de diálogo para obtener el nombre y la URL
+    nombre, ok_pressed = QInputDialog.getText(self, "Guardar URL", "Ingrese un nombre para la URL:")
+    if not ok_pressed or not nombre:
+        return  # Si el usuario cancela o no ingresa un nombre, salir
+    
+    url, ok_pressed = QInputDialog.getText(self, "Guardar URL", "Ingrese la URL:")
+    if not ok_pressed or not url:
+        return  # Si el usuario cancela o no ingresa una URL, salir
+    
+    urls = load_urls()
+    urls[nombre] = url
+    save_urls(urls)
+
+    QMessageBox.information(self, "Acción completada", f"URL guardada bajo el nombre '{nombre}'")
+
+
+def ver_urls_guardadas(self):
+    urls = load_urls()
+
+    if not urls:
+        QMessageBox.information(self, "Información", "No hay URLs guardadas.")
+        return
+
+    # Crear un diálogo para mostrar y gestionar URLs
+    dialog = QDialog(self)
+    dialog.setWindowTitle("URLs Guardadas")
+    layout = QVBoxLayout(dialog)
+
+    # Crear un área de desplazamiento
+    scroll_area = QScrollArea(dialog)
+    scroll_area.setWidgetResizable(True)
+
+    # Crear un widget contenedor para el área de desplazamiento
+    container_widget = QWidget()
+    container_layout = QVBoxLayout(container_widget)
+
+    list_widget = QListWidget(container_widget)
+    for nombre in urls:
+        list_widget.addItem(nombre)
+
+    container_layout.addWidget(list_widget)
+    container_widget.setLayout(container_layout)
+    scroll_area.setWidget(container_widget)
+
+    layout.addWidget(scroll_area)
+
+    # Añadir botones para editar, eliminar y copiar URL
+    edit_button = QPushButton("Editar URL", dialog)
+    delete_button = QPushButton("Eliminar URL", dialog)
+    copy_button = QPushButton("Copiar URL", dialog)
+
+    def edit_url():
+        current_item = list_widget.currentItem()
+        if current_item:
+            nombre_original = current_item.text()
+
+            # Editar el nombre
+            nuevo_nombre, ok_pressed = QInputDialog.getText(dialog, "Editar Nombre", "Modifica el nombre:", text=nombre_original)
+            if not ok_pressed or not nuevo_nombre:
+                QMessageBox.warning(dialog, "Advertencia", "El nombre no puede estar vacío.")
+                return
+
+            # Editar la URL
+            nueva_url, ok_pressed = QInputDialog.getText(dialog, "Editar URL", "Modifica la URL:", text=urls[nombre_original])
+            if not ok_pressed or not nueva_url:
+                QMessageBox.warning(dialog, "Advertencia", "La URL no puede estar vacía.")
+                return
+
+            # Actualizar el registro y guardar
+            del urls[nombre_original]  # Eliminar el antiguo nombre
+            urls[nuevo_nombre] = nueva_url
+            save_urls(urls)
+
+            # Actualizar la lista en la UI
+            current_item.setText(nuevo_nombre)
+
+            QMessageBox.information(dialog, "Éxito", f"'{nombre_original}' actualizado correctamente a '{nuevo_nombre}'.")
+
+    def delete_url():
+        current_item = list_widget.currentItem()
+        if current_item:
+            nombre = current_item.text()
+            del urls[nombre]
+            save_urls(urls)
+            list_widget.takeItem(list_widget.row(current_item))
+            QMessageBox.information(dialog, "Éxito", f"URL '{nombre}' eliminada correctamente.")
+
+    def copy_url():
+        current_item = list_widget.currentItem()
+        if current_item:
+            nombre = current_item.text()
+            url = urls[nombre]
+            clipboard = QApplication.clipboard()
+            clipboard.setText(url)
+            QMessageBox.information(dialog, "Éxito", f"URL '{url}' copiada al portapapeles.")
+
+    edit_button.clicked.connect(edit_url)
+    delete_button.clicked.connect(delete_url)
+    copy_button.clicked.connect(copy_url)
+
+    layout.addWidget(edit_button)
+    layout.addWidget(delete_button)
+    layout.addWidget(copy_button)
+
+    dialog.setLayout(layout)
+    dialog.exec_()

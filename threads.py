@@ -39,20 +39,13 @@ Ejemplo:
     En `M3UOrganizer`, estos hilos se inician para cargar archivos y buscar términos, con sus señales conectadas 
     a métodos que actualizan la UI o realizan otras acciones en respuesta a los eventos emitidos.
 
-Autores:
-    - entreunosyceros (autor principal)
-
+Autor:
+    - entreunosyceros
 Versión:
     0.5
-
-Licencia:
-    Libre para uso personal y educativo.
-
 """
 
 from PyQt5.QtCore import QThread, pyqtSignal
-import os
-from PyQt5.QtWidgets import QMessageBox
 
 class LoadFileThread(QThread):
     progress = pyqtSignal(int)
