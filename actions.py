@@ -85,6 +85,8 @@ def show_context_menu(main_window, position):
 
 # Funciones para abrir con VLC
 
+
+
 def is_vlc_installed(command):
     """Verifica si VLC está instalado intentando ejecutar el comando."""
     try:

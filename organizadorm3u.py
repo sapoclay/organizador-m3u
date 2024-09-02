@@ -221,6 +221,11 @@ class M3UOrganizer(QMainWindow):
         # Menú Listas
         list_menu = menubar.addMenu('Listas')
         
+        # Acción para seleccionar y reproducir un archivo M3U
+        play_m3u_action = QAction('Reproducir lista M3U en VLC', self)
+        play_m3u_action.triggered.connect(self.play_m3u_file)
+        list_menu.addAction(play_m3u_action)
+        
         # Subopción guardar URL
         save_list_action = QAction('Guardar URL', self)
         save_list_action.triggered.connect(lambda: guardar_url(self) )
@@ -269,6 +274,24 @@ class M3UOrganizer(QMainWindow):
         video_dialog = VideoDialog(self, instance=self.instance)  # Crear una instancia de VideoDialog
         video_dialog.play_video(url)
         video_dialog.exec_()
+        
+    def play_m3u_file(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Seleccionar archivo M3U", "", "M3U Files (*.m3u);;All Files (*)", options=options)
+        
+        if file_path:
+            open_with_vlc(self, file_path)
+        else:
+            QMessageBox.warning(self, "Advertencia", "No se ha seleccionado un archivo M3U")
+
+    def extract_urls_from_m3u(self, file_path):
+        urls = []
+        with open(file_path, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line and not line.startswith('#'):  # Ignorar las líneas de comentarios
+                    urls.append(line)
+        return urls
 
     def load_m3u(self):
         options = QFileDialog.Options()

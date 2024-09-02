@@ -12,6 +12,7 @@ M3U Organizer es una aplicación que escribí por que alguien me ha pedido una a
 - **Reproducción con VLC**: Abre enlaces directamente en VLC desde la aplicación.
 - **Exportación de Listas**: Guarda tus listas de reproducción editadas en formato M3U.
 - **Listas**: Nos va a permitir guardar nuestras listas m3u preferidas. Podremos guardar la URL, y añadir un nombre identificativo. Se podrá copiar la URL para utilizarla para poder trabajar o ver la lista m3u. El listado de URL se guardará como archivo .JSON en el mismo directorio del programa.
+- **Reproducir listas m3u**: Desde la opción Listas, del menú, podremos reproducir archivos m3u utilizando el reproductor VLC para ello.
 - **Menú Contextual**: Accede a funciones útiles mediante el menú contextual, como copiar, pegar, previsualizar y abrir con VLC.
 
 ## Capturas de Pantalla
